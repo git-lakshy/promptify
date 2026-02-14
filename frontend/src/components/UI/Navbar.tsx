@@ -1,13 +1,15 @@
+import pIcon from '../../assets/p-icon.png';
+
 const Navbar = () => {
     return (
         <nav className="fixed top-0 w-full z-50 px-6 md:px-12 py-6">
             <div className="max-w-7xl mx-auto relative flex items-center justify-between">
                 {/* Logo */}
-                <div className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg border border-white/20">
-                        <i className="fa-solid fa-pen-nib text-sm"></i>
+                <div className="flex items-center gap-2 cursor-pointer group">
+                    <div className="w-10 h-10 flex items-center justify-center overflow-visible">
+                        <img src={pIcon} alt="Promptify" className="w-full h-full object-contain brightness-110" />
                     </div>
-                    <span className="text-xl font-bold tracking-wide text-white drop-shadow-sm">
+                    <span className="text-xl font-bold tracking-wide text-white drop-shadow-sm uppercase">
                         PROMPTIFY
                     </span>
                 </div>
