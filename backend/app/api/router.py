@@ -10,7 +10,13 @@ from app.core.logging import logger
 router = APIRouter(prefix="/api")
 
 def get_fingerprint(request: Request, client_fp: str) -> str:
-    ip = request.client.host if request.client else "unknown"
+    # Check X-Forwarded-For for proxy/load-balancer support (Render/Vercel)
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        ip = forwarded.split(",")[0].strip()
+    else:
+        ip = request.client.host if request.client else "unknown"
+        
     ua = request.headers.get("user-agent", "")
     lang = request.headers.get("accept-language", "")
     return compute_fingerprint(ip, ua, lang, client_fp)

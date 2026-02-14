@@ -12,7 +12,9 @@ def setup_logging():
         level="INFO",
     )
     
-    # Add file logging for errors
+    # Add file logging for errors with auto-directory creation
+    import os
+    os.makedirs("logs", exist_ok=True)
     logger.add(
         "logs/error.log",
         rotation="10 MB",
