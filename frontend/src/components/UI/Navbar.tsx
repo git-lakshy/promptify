@@ -17,6 +17,7 @@ const Navbar = () => {
 
                 {/* Center Nav Links */}
                 <div className="hidden md:flex items-center gap-10 text-xs font-medium tracking-widest text-slate-300/90 uppercase absolute left-1/2 -translate-x-1/2">
+                    <Link to="/" className="hover:text-white transition-colors no-underline">Enhance</Link>
                     <Link to="/limits" className="hover:text-white transition-colors no-underline">Limits</Link>
                     <a href="https://lakshyeah.in/my-work" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1 no-underline">
                         more

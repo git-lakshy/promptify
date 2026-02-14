@@ -61,6 +61,17 @@ const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading }) => {
                             <span>Advanced</span>
                         </button>
 
+                        {/* Skills.md Section (Paid) */}
+                        <div className="relative group/tooltip">
+                            <div className="input-pill text-sm opacity-40 cursor-help border-dashed border-white/20">
+                                <span>Skills.md</span>
+                            </div>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-lg text-[10px] text-white/90 whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl uppercase tracking-widest">
+                                paid feature : Create skills for your AI
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Send Button */}

@@ -12,12 +12,12 @@ class Settings(BaseSettings):
     # Rate Limits
     RATE_LIMITS: Dict[str, Dict[str, int]] = {
         "normal": {
-            "max_prompts": 20,
-            "window_minutes": 60,
+            "max_hourly": 10,
+            "max_daily": 20,
         },
         "advanced": {
-            "max_prompts": 10,
-            "window_minutes": 60,
+            "max_hourly": 5,
+            "max_daily": 10,
         },
     }
     
