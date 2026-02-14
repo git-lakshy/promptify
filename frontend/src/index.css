@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+:root {
+  --deep-blue: #0f172a;
+  --glow-blue: #3b82f6;
+  --glow-blue-fade: rgba(59, 130, 246, 0.6);
+  --glow-blue-soft: rgba(37, 99, 235, 0.3);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #000;
+  color: white;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Inverted Semi-Circle Gradient Background */
+.hero-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 50% 0%, #020617 0%, #0a0f1c 30%, transparent 70%),
+    radial-gradient(circle at 50% 100%, #bfdbfe 0%, #60a5fa 20%, #1e40af 60%, #020617 100%);
+  background-size: 100% 100%;
+}
+
+/* The Blue Horizontal Glow (Right Side) */
+.glow-beam {
+  position: fixed;
+  right: -10%;
+  top: 20%;
+  width: 80vw;
+  height: 60vh;
+  background: radial-gradient(ellipse 100% 50% at 100% 50%,
+      var(--glow-blue-fade) 0%,
+      var(--glow-blue-soft) 40%,
+      transparent 70%);
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+  transform: rotate(-15deg);
+}
+
+/* Secondary ambient glow */
+.ambient-fog {
+  position: fixed;
+  bottom: -20%;
+  left: -10%;
+  width: 120vw;
+  height: 60vh;
+  background: radial-gradient(ellipse at center, rgba(147, 197, 253, 0.3), transparent 60%);
+  filter: blur(60px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Noise Texture Overlay */
+#noise-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.hero-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.dotted-underline {
+  position: relative;
+  font-style: italic;
+}
+
+.dotted-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.4) 50%, transparent 50%);
+  background-size: 4px 1px;
+  background-repeat: repeat-x;
+}
+
+/* Authentic Glass Input Bar */
+.glass-input-container {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dark-glass-input-container {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.output-glass-container {
+  background: rgba(10, 15, 28, 0.9) !important;
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.input-pill {
+  position: relative;
+  background: transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 8px 16px;
+  color: #94a3b8;
+  /* slate-400 */
+  transition: color 0.3s ease;
+}
+
+.input-pill.active {
+  color: white !important;
+}
+
+.input-pill::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+  border-radius: 0;
+  transform: translateX(-50%);
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.input-pill:hover::after,
+.input-pill.active::after {
+  width: 80%;
+  border-radius: 50%;
+}
+
+.input-pill:not(.active):hover::after {
+  opacity: 0.6;
+}
+
+/* Send Button */
+.send-btn {
+  background: rgba(148, 163, 184, 0.3);
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  background: #3b82f6;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+@keyframes progress-shrink {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.animate-progress-shrink {
+  animation: progress-shrink 5s linear forwards;
+}
