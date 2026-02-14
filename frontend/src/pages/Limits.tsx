@@ -6,11 +6,11 @@ const Limits: React.FC = () => {
             <div className="max-w-6xl w-full flex flex-col md:flex-row items-stretch justify-center gap-8 mt-10 min-h-[400px]">
 
                 {/* Left Container */}
-                <div className="flex-1 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <div className="flex-1 bg-transparent border border-white/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-slate-200">
                     <div className="h-full w-full flex flex-col items-start space-y-8">
                         <div className="space-y-4 w-full group/line cursor-pointer">
+                            <h2 className="text-sm text-4xl md:text-6xl lg:text-4xl text-white l-[0.2em]">Free Tier</h2>
                             <div className="w-12 h-1 bg-blue-400/30 rounded-full transition-all duration-300 group-hover/line:bg-blue-400/60 group-hover/line:shadow-[0_0_15px_rgba(96,165,250,0.5)]"></div>
-                            <h2 className="text-sm font-medium text-white/90 uppercase tracking-[0.2em]">Free Tier</h2>
                         </div>
 
                         <table className="w-full text-left border-collapse">
@@ -33,18 +33,18 @@ const Limits: React.FC = () => {
                                 </tr>
                             </tbody>
                         </table>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-4">
+                        <p className="text-[10px] text-white-500 uppercase tracking-widest pt-4">
                             * You can use your own key to bypass free tier limits.
                         </p>
                     </div>
                 </div>
 
                 {/* Right Container */}
-                <div className="flex-1 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <div className="flex-1 bg-transparent border border-white/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                     <div className="h-full w-full flex flex-col items-start space-y-8">
                         <div className="space-y-4 w-full group/line cursor-pointer">
+                            <h2 className="text-sm text-4xl md:text-6xl lg:text-4xl text-white l-[0.2em]">Paid Tier</h2>
                             <div className="w-12 h-1 bg-indigo-400/30 rounded-full transition-all duration-300 group-hover/line:bg-indigo-400/60 group-hover/line:shadow-[0_0_15px_rgba(129,140,248,0.5)]"></div>
-                            <h2 className="text-sm font-medium text-white/90 uppercase tracking-[0.2em]">Paid Tier</h2>
                         </div>
 
                         <table className="w-full text-left border-collapse">
@@ -73,8 +73,8 @@ const Limits: React.FC = () => {
                                 </tr>
                             </tbody>
                         </table>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-4">
-                            One time purchase to bypass all limits.
+                        <p className="text-[10px] text-white-500 uppercase tracking-widest pt-4">
+                            * One time purchase to bypass all limits.
                         </p>
                     </div>
                 </div>
