@@ -6,6 +6,8 @@ from fastapi.exceptions import RequestValidationError
 from app.api.router import router
 from app.services.rate_limiter import init_db
 from app.core.logging import logger
+from app.core.config import settings
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
