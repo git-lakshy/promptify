@@ -35,6 +35,9 @@ class Settings(BaseSettings):
         "advanced": 2048,
     }
     
+    # CORS
+    ALLOWED_ORIGINS: List[str] = ["*"]
+
     # BYOK (Bring Your Own Key)
     BYOK_ENABLED: bool = True
     BYOK_PROVIDER: str = "gemini"
