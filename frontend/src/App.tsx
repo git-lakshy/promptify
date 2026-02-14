@@ -10,7 +10,7 @@ import type { EnhanceResponse } from './services/api';
 
 import { Routes, Route } from 'react-router-dom';
 import Limits from './pages/Limits';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 
 function Home({ onSend, isLoading, response }: any) {
     return (
