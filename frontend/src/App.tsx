@@ -10,6 +10,7 @@ import type { EnhanceResponse } from './services/api';
 
 import { Routes, Route } from 'react-router-dom';
 import Limits from './pages/Limits';
+import { Analytics } from '@vercel/analytics/react';
 
 function Home({ onSend, isLoading, response }: any) {
     return (
@@ -80,6 +81,7 @@ function App() {
 
     return (
         <div className="min-h-screen flex flex-col relative overflow-hidden">
+            <Analytics />
             <HeroBackground />
             <Navbar />
 

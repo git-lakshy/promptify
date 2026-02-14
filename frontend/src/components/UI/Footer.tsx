@@ -8,6 +8,7 @@ const Footer: React.FC<FooterProps> = ({ onUpgradeClick }) => {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-6">
                 {/* Left: Scroll Indicator */}
                 <div className="flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer">
+                    <i className="fa-solid fa-arrow-down animate-bounce text-xs"></i>
                 </div>
 
                 {/* Center: Subtext */}
