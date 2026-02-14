@@ -30,8 +30,8 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, isVisible, error
                 >
                     <div className="glass-input-container output-glass-container rounded-3xl p-6 transition-all duration-300">
                         <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-widest">
-                                {error ? 'Error' : blocked ? 'Blocked' : 'Enhanced Prompt'}
+                            <h3 className={`text-sm font-medium uppercase tracking-widest ${error === 'SKILL ISSUE' ? 'text-red-500' : 'text-slate-400'}`}>
+                                {error === 'SKILL ISSUE' ? 'SKILL ISSUE' : error ? 'Error' : blocked ? 'Blocked' : 'Enhanced Prompt'}
                             </h3>
                             {content && !error && !blocked && (
                                 <button
@@ -53,8 +53,8 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, isVisible, error
                             )}
                         </div>
 
-                        <div className={`${error || blocked ? 'text-red-400' : 'text-slate-200'} text-lg font-light leading-relaxed whitespace-pre-wrap`}>
-                            {error || content || (blocked && 'Content blocked by safety filters.')}
+                        <div className={`${error === 'SKILL ISSUE' ? 'text-red-400' : (error || blocked ? 'text-red-400' : 'text-slate-200')} text-lg font-light leading-relaxed whitespace-pre-wrap`}>
+                            {error === 'SKILL ISSUE' ? 'Ahahahahaha. Good Try.' : (error || content || (blocked && 'Content blocked by safety filters.'))}
                         </div>
                     </div>
                 </motion.div>

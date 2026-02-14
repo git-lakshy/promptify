@@ -33,6 +33,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "message": "Promptify API is running",
+        "version": "1.1.0",
+        "docs": "/docs"
+    }
+
 app.include_router(router)
 
 @app.exception_handler(RequestValidationError)

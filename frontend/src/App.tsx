@@ -8,6 +8,30 @@ import Notification from './components/UI/Notification';
 import { enhancePrompt } from './services/api';
 import type { EnhanceResponse } from './services/api';
 
+import { Routes, Route } from 'react-router-dom';
+import Limits from './pages/Limits';
+
+function Home({ onSend, isLoading, response }: any) {
+    return (
+        <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-8 pt-24 pb-12 relative z-10">
+            <div className="max-w-4xl w-full flex flex-col items-center text-center space-y-10 mt-10">
+                <div className="space-y-2">
+                    <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1]">
+                        Promptify - prompt <span className="dotted-underline text-blue-200">better</span> Turn <span className="dotted-underline text-white/90">ideas</span> into <span className="dotted-underline text-white/90">instructions</span>.
+                    </h1>
+                </div>
+                <PromptInput onSend={onSend} isLoading={isLoading} />
+                <OutputDisplay
+                    content={response?.enhanced_prompt || ''}
+                    isVisible={!!response?.enhanced_prompt}
+                    error={response?.error || response?.rate_limit_message}
+                    blocked={response?.blocked}
+                />
+            </div>
+        </main>
+    );
+}
+
 function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState<EnhanceResponse | null>(null);
@@ -15,7 +39,6 @@ function App() {
     const [showNotification, setShowNotification] = useState(false);
 
     useEffect(() => {
-        // Generate or retrieve fingerprint
         let fp = localStorage.getItem('promptify_fp');
         if (!fp) {
             fp = crypto.randomUUID();
@@ -50,7 +73,6 @@ function App() {
 
     const handleUpgrade = () => {
         setShowNotification(true);
-        // Auto-hide after 5 seconds to match animation
         setTimeout(() => {
             setShowNotification(false);
         }, 5000);
@@ -67,27 +89,12 @@ function App() {
                 onClose={() => setShowNotification(false)}
             />
 
-            <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-8 pt-24 pb-12 relative z-10">
-                <div className="max-w-4xl w-full flex flex-col items-center text-center space-y-10 mt-10">
-
-                    {/* Headline */}
-                    <div className="space-y-2">
-                        <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1]">
-                            Promptify - prompt <span className="dotted-underline text-blue-200">better</span> Turn <span className="dotted-underline text-white/90">ideas</span> into <span className="dotted-underline text-white/90">instructions</span>.
-                        </h1>
-                    </div>
-
-                    <PromptInput onSend={handleSend} isLoading={isLoading} />
-
-                    <OutputDisplay
-                        content={response?.enhanced_prompt || ''}
-                        isVisible={!!response?.enhanced_prompt}
-                        error={response?.error || response?.rate_limit_message}
-                        blocked={response?.blocked}
-                    />
-
-                </div>
-            </main>
+            <Routes>
+                <Route path="/" element={
+                    <Home onSend={handleSend} isLoading={isLoading} response={response} />
+                } />
+                <Route path="/limits" element={<Limits />} />
+            </Routes>
 
             <Footer onUpgradeClick={handleUpgrade} />
         </div>

@@ -54,7 +54,7 @@ async def enhance_prompt(body: EnhanceRequest, request: Request):
             mode=body.mode,
             blocked=True,
             blocked_keywords=matched,
-            error="Restricted patterns detected. Please rephrase.",
+            error="SKILL ISSUE",
         )
 
     # Enhance via LLM
