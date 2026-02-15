@@ -14,7 +14,7 @@ import { Analytics } from '@vercel/analytics/react';
 
 function Home({ onSend, isLoading, response }: any) {
     return (
-        <main className="flex-grow flex flex-col items-center justify-center pl-[70px] pr-4 md:px-8 pt-24 pb-12 relative z-10">
+        <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-8 pt-24 pb-12 relative z-10">
             <div className="max-w-4xl w-full flex flex-col items-center text-center space-y-10 mt-10">
                 <div className="space-y-2">
                     <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1]">
