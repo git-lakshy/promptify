@@ -8,7 +8,7 @@ const Navbar = () => {
             <nav className="hidden md:block fixed top-0 w-full z-50 px-12 py-6">
                 <div className="max-w-7xl mx-auto relative flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 cursor-pointer group no-underline">
-                        <div className="w-10 h-10 flex items-center justify-center overflow-visible">
+                        <div className="w-10 h-10 flex items-center justify-center overflow-visible hover:scale-110 active:scale-90 transition-transform duration-150 ease-out">
                             <img src={pIcon} alt="Promptify" className="w-full h-full object-contain brightness-110" />
                         </div>
                         <span className="text-xl font-bold tracking-wide text-white drop-shadow-sm uppercase">
@@ -35,8 +35,8 @@ const Navbar = () => {
 
             {/* Mobile Navbar (Vertical Sidebar on Left) */}
             <nav className="md:hidden fixed left-0 top-0 h-full w-[70px] z-50 flex flex-col items-center py-8 border-r border-white/10 bg-black/40 backdrop-blur-xl">
-                <Link to="/" className="w-10 h-10 flex items-center justify-center mb-12">
-                    <img src={pIcon} alt="Promptify" className="w-full h-full object-contain brightness-110" />
+                <Link to="/" className="w-10 h-10 flex items-center justify-center mb-12 group">
+                    <img src={pIcon} alt="Promptify" className="w-full h-full object-contain brightness-110 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out" />
                 </Link>
 
                 <div className="flex-grow flex flex-col items-center space-y-8">

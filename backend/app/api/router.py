@@ -48,13 +48,13 @@ async def enhance_prompt(body: EnhanceRequest, request: Request):
         )
 
     # Sanitize input
-    clean_text, is_blocked, matched = await sanitize(body.prompt)
+    clean_text, is_blocked, matched, easter_egg = await sanitize(body.prompt)
     if is_blocked:
         return EnhanceResponse(
             mode=body.mode,
             blocked=True,
             blocked_keywords=matched,
-            error="SKILL ISSUE",
+            error=easter_egg,
         )
 
     # Enhance via LLM
