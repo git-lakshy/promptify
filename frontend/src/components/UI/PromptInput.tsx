@@ -32,7 +32,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading }) => {
                 <div className="flex items-center px-4 py-3">
                     <input
                         type="text"
-                        placeholder="enter prompt to enhance..."
+                        placeholder="select mode and enter prompt to enhance..."
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -44,22 +44,33 @@ const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading }) => {
                 {/* Bottom Tools Row */}
                 <div className="flex items-center justify-between px-2 pb-2 mt-1">
                     <div className="flex items-center gap-2">
-
                         {/* normal mode*/}
-                        <button
-                            onClick={() => setMode('normal')}
-                            className={`input-pill text-sm ${mode === 'normal' ? 'active' : ''}`}
-                        >
-                            <span>Normal</span>
-                        </button>
+                        <div className="relative group/tooltip">
+                            <button
+                                onClick={() => setMode('normal')}
+                                className={`input-pill text-sm ${mode === 'normal' ? 'active' : ''}`}
+                            >
+                                <span>Normal</span>
+                            </button>
+                            {/* Tooltip */}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-lg text-[10px] text-white/90 whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl uppercase tracking-widest">
+                                simple improvement
+                            </div>
+                        </div>
 
                         {/* advanced mode --> */}
-                        <button
-                            onClick={() => setMode('advanced')}
-                            className={`input-pill text-sm ${mode === 'advanced' ? 'active' : ''}`}
-                        >
-                            <span>Advanced</span>
-                        </button>
+                        <div className="relative group/tooltip">
+                            <button
+                                onClick={() => setMode('advanced')}
+                                className={`input-pill text-sm ${mode === 'advanced' ? 'active' : ''}`}
+                            >
+                                <span>Advanced</span>
+                            </button>
+                            {/* Tooltip */}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-lg text-[10px] text-white/90 whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl uppercase tracking-widest">
+                                detailed enhancement
+                            </div>
+                        </div>
 
                         {/* Skills.md Section (Paid) */}
                         <div className="relative group/tooltip">
@@ -67,7 +78,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading }) => {
                                 <span>Skills.md</span>
                             </div>
                             {/* Tooltip */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-lg text-[10px] text-white/90 whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl uppercase tracking-widest">
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-lg text-[10px] text-white/90 whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl uppercase tracking-widest">
                                 paid feature : Create skills for your AI
                             </div>
                         </div>
