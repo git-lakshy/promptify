@@ -20,12 +20,21 @@ export interface EnhanceResponse {
     usage?: any;
 }
 
+function getAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('promptify_token');
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
 export const enhancePrompt = async (data: EnhanceRequest): Promise<EnhanceResponse> => {
     const response = await fetch(`${API_URL}/enhance`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
     });
 

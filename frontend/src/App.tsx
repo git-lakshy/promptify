@@ -8,8 +8,10 @@ import Notification from './components/UI/Notification';
 import { enhancePrompt } from './services/api';
 import type { EnhanceResponse } from './services/api';
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Limits from './pages/Limits';
+import LoginPage from './pages/LoginPage';
+import AuthCallback from './pages/AuthCallback';
 import { Analytics } from '@vercel/analytics/react';
 
 function Home({ onSend, isLoading, response }: any) {
@@ -38,6 +40,10 @@ function App() {
     const [response, setResponse] = useState<EnhanceResponse | null>(null);
     const [fingerprint, setFingerprint] = useState('');
     const [showNotification, setShowNotification] = useState(false);
+    const location = useLocation();
+
+    // Don't show navbar/footer on auth pages
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/auth/callback';
 
     useEffect(() => {
         let fp = localStorage.getItem('promptify_fp');
@@ -64,7 +70,6 @@ function App() {
                 mode,
                 blocked: false,
                 blocked_keywords: [],
-                rate_limited: false,
                 error: error.message || 'An unexpected error occurred.',
             } as EnhanceResponse);
         } finally {
@@ -82,8 +87,8 @@ function App() {
     return (
         <div className="min-h-screen flex flex-col relative overflow-hidden">
             <Analytics />
-            <HeroBackground />
-            <Navbar />
+            {!isAuthPage && <HeroBackground />}
+            {!isAuthPage && <Navbar />}
 
             <Notification
                 message="Upgrading will soon be available for now you can use your own key to Bypass limits."
@@ -96,9 +101,11 @@ function App() {
                     <Home onSend={handleSend} isLoading={isLoading} response={response} />
                 } />
                 <Route path="/limits" element={<Limits />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
             </Routes>
 
-            <Footer onUpgradeClick={handleUpgrade} />
+            {!isAuthPage && <Footer onUpgradeClick={handleUpgrade} />}
         </div>
     );
 }

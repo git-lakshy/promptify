@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom';
 import pIcon from '../../assets/p-icon.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
+    const { user, logout, isLoading } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        window.location.reload();
+    };
+
     return (
         <>
             {/* Desktop Navbar (Horizontal) */}
@@ -26,16 +34,35 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <span className="text-xs text-slate-400 cursor-pointer hover:text-white">
-                            EN
-                        </span>
+                        {isLoading ? (
+                            <div className="w-16 h-4 bg-white/10 rounded animate-pulse" />
+                        ) : user ? (
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-slate-300 hidden lg:block">
+                                    {user.name || user.email}
+                                </span>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer px-3 py-1 rounded border border-white/10 hover:border-white/30"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="text-xs text-white hover:text-blue-200 transition-colors px-4 py-2 rounded border border-white/20 hover:border-blue-400/50 hover:bg-blue-500/10"
+                            >
+                                Sign In
+                            </Link>
+                        )}
                     </div>
                 </div>
             </nav>
 
             {/* Mobile Navbar (Vertical Sidebar on Left) */}
             <nav className="md:hidden fixed left-0 top-0 h-full w-[70px] z-50 flex flex-col items-center py-8 border-r border-white/10 bg-black/40 backdrop-blur-xl">
-                <Link to="/" className="w-10 h-10 flex items-center justify-center mb-12 group">
+                <Link to="/" className="w-10 h-10 flex items-center justify-center mb-8 group">
                     <img src={pIcon} alt="Promptify" className="w-full h-full object-contain brightness-110 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out" />
                 </Link>
 
@@ -51,10 +78,24 @@ const Navbar = () => {
                     </a>
                 </div>
 
-                <div className="mt-auto">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest cursor-pointer hover:text-white">
-                        EN
-                    </span>
+                <div className="mt-auto flex flex-col items-center space-y-4">
+                    {isLoading ? (
+                        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-blue-400 animate-spin" />
+                    ) : user ? (
+                        <button
+                            onClick={handleLogout}
+                            className="text-[10px] text-slate-400 hover:text-white transition-colors whitespace-nowrap tracking-widest uppercase py-2"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <Link
+                            to="/login"
+                            className="text-[10px] text-blue-300 hover:text-white transition-colors whitespace-nowrap tracking-widest uppercase py-2"
+                        >
+                            Sign In
+                        </Link>
+                    )}
                 </div>
             </nav>
         </>
