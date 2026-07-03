@@ -1,14 +1,35 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Dict, List
+import os
 
 class Settings(BaseSettings):
+    # Environment
+    ENVIRONMENT: str = "development"
+
     # LLM Provider Priority
     LLM_PROVIDERS: List[str] = ["groq", "gemini"]
-    
+
     # API Keys
     GEMINI_API_KEY: str = ""
     GROQ_API_KEY: str = ""
-    
+
+    # Database
+    DATABASE_URL: str = "sqlite+aiosqlite:///./promptify.db"
+
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    # Auth
+    SECRET_KEY: str = "supersecretkeychangeme"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    FRONTEND_URL: str = "http://localhost:5173"
+    BACKEND_URL: str = "http://localhost:8000"
+
     # Rate Limits
     RATE_LIMITS: Dict[str, Dict[str, int]] = {
         "normal": {
@@ -20,21 +41,21 @@ class Settings(BaseSettings):
             "max_daily": 10,
         },
     }
-    
+
     # Progressive Cooldowns (in minutes)
-    PROGRESSIVE_COOLDOWNS: List[int] = [300, 600, 1440]  # 5h, 10h, 24h
-    
+    PROGRESSIVE_COOLDOWNS: List[int] = [300, 600, 1440]
+
     # Token / Length Limits
     MAX_INPUT_CHARS: Dict[str, int] = {
         "normal": 200,
         "advanced": 400,
     }
-    
+
     MAX_OUTPUT_TOKENS: Dict[str, int] = {
         "normal": 1024,
         "advanced": 2048,
     }
-    
+
     # CORS
     ALLOWED_ORIGINS: List[str] = ["*"]
 

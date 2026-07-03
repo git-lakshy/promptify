@@ -1,10 +1,8 @@
-import time
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.exceptions import RequestValidationError
-from starlette_prometheus import metrics, PrometheusMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from app.api.router import router
 from app.api.auth import router as auth_router
@@ -13,6 +11,9 @@ from app.core.database import init_db as init_main_db
 from app.core.logging import logger
 from app.core.config import settings
 from app.core.redis_client import redis_client
+from app.core.middleware import MetricsMiddleware
+from app.core.metrics import get_metrics
+from prometheus_client import CONTENT_TYPE_LATEST
 
 
 @asynccontextmanager
@@ -51,8 +52,8 @@ app.add_middleware(
     same_site="lax",
 )
 
-# Prometheus metrics middleware
-app.add_middleware(PrometheusMiddleware)
+# Custom Prometheus metrics middleware
+app.add_middleware(MetricsMiddleware)
 
 @app.get("/")
 async def root():
@@ -67,8 +68,13 @@ async def root():
 app.include_router(router)
 app.include_router(auth_router)
 
-# Prometheus metrics endpoint - needs to be after router include
-app.add_route("/api/metrics", metrics)
+# Prometheus metrics endpoint - expose custom prometheus_client metrics
+@app.get("/api/metrics")
+async def metrics_endpoint():
+    metrics_content = await get_metrics()
+    # Use Response to handle bytes directly; PlainTextResponse would do str(content).encode()
+    # which re-encodes bytes and corrupts the output from prometheus_client
+    return Response(content=metrics_content, media_type=CONTENT_TYPE_LATEST)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
