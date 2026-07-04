@@ -56,8 +56,12 @@ class Settings(BaseSettings):
         "advanced": 2048,
     }
 
-    # CORS
-    ALLOWED_ORIGINS: List[str] = ["*"]
+    # CORS (comma-separated list for production)
+    ALLOWED_ORIGINS: List[str] = [
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", "*").split(",")
+        if origin.strip()
+    ]
 
     # BYOK (Bring Your Own Key)
     BYOK_ENABLED: bool = True
