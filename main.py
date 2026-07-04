@@ -6,7 +6,7 @@ from pathlib import Path
 # This allows 'uvicorn main:app' to work from the project root
 backend_root = Path(__file__).parent / "backend"
 if backend_root.exists():
-    sys.path.append(str(backend_root))
+    sys.path.insert(0, str(backend_root))
 
 try:
     from app.main import app

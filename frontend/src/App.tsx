@@ -70,6 +70,7 @@ function App() {
                 mode,
                 blocked: false,
                 blocked_keywords: [],
+                rate_limited: false,
                 error: error.message || 'An unexpected error occurred.',
             } as EnhanceResponse);
         } finally {
