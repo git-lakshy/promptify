@@ -1,14 +1,19 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
-from sqlalchemy.sql import func
-from app.core.database import Base
+from pydantic import BaseModel, Field, ConfigDict, BeforeValidator
+from typing import Optional, Annotated
+from datetime import datetime, timezone
 
-class PromptHistory(Base):
-    __tablename__ = "prompt_histories"
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
-    original_prompt = Column(Text, nullable=False)
-    enhanced_prompt = Column(Text, nullable=True)
-    mode = Column(String(20), nullable=False)
-    provider_used = Column(String(50), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+class PromptHistory(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    user_id: Optional[str] = None
+    original_prompt: str
+    enhanced_prompt: Optional[str] = None
+    mode: str
+    provider_used: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+    )

@@ -1,10 +1,9 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from authlib.integrations.starlette_client import OAuth
 from pydantic import BaseModel, EmailStr
+from bson import ObjectId
 from app.core.config import settings
 from app.core.security import create_access_token, create_refresh_token, decode_token, verify_password, get_password_hash
 from app.core.database import get_db
@@ -68,8 +67,9 @@ async def google_login(request: Request):
     redirect_uri = f"{settings.BACKEND_URL}/api/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
+
 @router.get("/google/callback")
-async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
+async def google_callback(request: Request, db = Depends(get_db)):
     """Handle Google OAuth callback."""
     try:
         token = await oauth.google.authorize_access_token(request)
@@ -89,27 +89,38 @@ async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
     name = user_info.get('name')
     avatar_url = user_info.get('picture')
 
-    # Check if user exists
-    result = await db.execute(select(User).where(User.email == email))
-    user = result.scalar_one_or_none()
+    # Check if user exists in MongoDB
+    user_doc = await db.users.find_one({"email": email})
 
-    if not user:
+    if not user_doc:
         user = User(
             email=email,
-            name=name,
+            name=name or "",
             avatar_url=avatar_url,
             google_id=google_id,
         )
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
+        user_dict = user.model_dump(by_alias=True)
+        if user_dict.get("_id") is None:
+            user_dict.pop("_id", None)
+        result = await db.users.insert_one(user_dict)
+        user.id = str(result.inserted_id)
         logger.info(f"new_user_created={email}")
     else:
-        # Update user info
-        user.name = name or user.name
-        user.avatar_url = avatar_url or user.avatar_url
-        await db.commit()
-        await db.refresh(user)
+        user = User(**user_doc)
+        # Update user info if changed
+        update_data = {}
+        if name and name != user.name:
+            user.name = name
+            update_data["name"] = name
+        if avatar_url and avatar_url != user.avatar_url:
+            user.avatar_url = avatar_url
+            update_data["avatar_url"] = avatar_url
+        
+        if update_data:
+            await db.users.update_one({"_id": user_doc["_id"]}, {"$set": update_data})
+            # Refresh user object from database
+            user_doc = await db.users.find_one({"_id": user_doc["_id"]})
+            user = User(**user_doc)
 
     access_token, refresh_token = await _issue_tokens(user)
 
@@ -120,11 +131,10 @@ async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
 
 # --- Email / Password Auth ---
 @router.post("/signup")
-async def signup(body: SignupRequest, db: AsyncSession = Depends(get_db)):
+async def signup(body: SignupRequest, db = Depends(get_db)):
     """Register a new user with email and password."""
     # Check if user exists
-    result = await db.execute(select(User).where(User.email == body.email))
-    existing = result.scalar_one_or_none()
+    existing = await db.users.find_one({"email": body.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -134,9 +144,11 @@ async def signup(body: SignupRequest, db: AsyncSession = Depends(get_db)):
         name=body.name or body.email.split("@")[0],
         password_hash=get_password_hash(body.password),
     )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    user_dict = user.model_dump(by_alias=True)
+    if user_dict.get("_id") is None:
+        user_dict.pop("_id", None)
+    result = await db.users.insert_one(user_dict)
+    user.id = str(result.inserted_id)
     logger.info(f"new_user_signup={body.email}")
 
     access_token, refresh_token = await _issue_tokens(user)
@@ -151,15 +163,15 @@ async def signup(body: SignupRequest, db: AsyncSession = Depends(get_db)):
         }
     }
 
-@router.post("/login")
-async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
-    """Authenticate with email and password."""
-    result = await db.execute(select(User).where(User.email == body.email))
-    user = result.scalar_one_or_none()
 
-    if not user or not user.password_hash:
+@router.post("/login")
+async def login(body: LoginRequest, db = Depends(get_db)):
+    """Authenticate with email and password."""
+    user_doc = await db.users.find_one({"email": body.email})
+    if not user_doc or not user_doc.get("password_hash"):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
+    user = User(**user_doc)
     if not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
@@ -179,7 +191,7 @@ async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 # --- Token Refresh ---
 @router.post("/refresh")
-async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
+async def refresh_token(body: RefreshRequest, db = Depends(get_db)):
     """Refresh access token."""
     payload = decode_token(body.token)
     if not payload or payload.get("type") != "refresh":
@@ -200,10 +212,15 @@ async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)
         raise HTTPException(status_code=401, detail="Refresh token expired")
 
     # Get user
-    result = await db.execute(select(User).where(User.id == int(user_id)))
-    user = result.scalar_one_or_none()
-    if not user:
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except Exception:
+        user_doc = None
+
+    if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
+
+    user = User(**user_doc)
 
     # Create new tokens
     new_access = create_access_token({"sub": str(user.id), "email": user.email})

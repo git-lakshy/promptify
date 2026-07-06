@@ -1,14 +1,19 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float
-from sqlalchemy.sql import func
-from app.core.database import Base
+from pydantic import BaseModel, Field, ConfigDict, BeforeValidator
+from typing import Optional, Annotated
+from datetime import datetime, timezone
 
-class UsageLog(Base):
-    __tablename__ = "usage_logs"
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
-    fingerprint = Column(String(32), nullable=True, index=True)
-    mode = Column(String(20), nullable=False)
-    provider_used = Column(String(50), nullable=True)
-    latency_ms = Column(Float, nullable=True)
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+class UsageLog(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    user_id: Optional[str] = None
+    fingerprint: Optional[str] = None
+    mode: str
+    provider_used: Optional[str] = None
+    latency_ms: Optional[float] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+    )
