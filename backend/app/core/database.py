@@ -1,69 +1,54 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import text
+from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
 from app.core.logging import logger
 
-# Build async database URL
-db_url = settings.DATABASE_URL
-if db_url.startswith("postgresql://"):
-    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+class MongoDBConnection:
+    client: AsyncIOMotorClient = None
+    db = None
 
-# Create async engine
-engine = create_async_engine(
-    db_url,
-    echo=settings.ENVIRONMENT == "development",
-    future=True,
-)
-
-# Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
-
-# Base class for models
-Base = declarative_base()
-
-async def get_db():
-    """Dependency to get database session."""
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-async def _run_migrations(conn):
-    """Run any pending database migrations."""
-    try:
-        # Try to add password_hash column (PostgreSQL syntax with IF NOT EXISTS)
-        await conn.execute(text(
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)"
-        ))
-        logger.info("Migration applied: ensured password_hash column exists")
-    except Exception as e:
-        # For SQLite or if column already exists
-        logger.debug(f"Migration check: {e}")
-        try:
-            await conn.execute(text(
-                "ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"
-            ))
-            logger.info("Migration applied: added password_hash column")
-        except Exception:
-            # Column already exists or other issue, safe to ignore
-            pass
+db_connection = MongoDBConnection()
 
 async def init_db():
-    """Initialize database - create tables and run migrations."""
-    from app.models.user import User
-    from app.models.usage import UsageLog
-    from app.models.prompt_history import PromptHistory
+    """Initialize MongoDB connection and build collections and indexes."""
+    logger.info("Initializing MongoDB connection...")
+    
+    # Initialize client
+    db_connection.client = AsyncIOMotorClient(settings.DATABASE_URL)
+    
+    # Try parsing db name from connection string (e.g. mongodb://host/db_name)
+    # If not found or fallback, default to "promptify"
+    db_name = "promptify"
+    try:
+        # Split string by / and extract database part before query params
+        path_parts = settings.DATABASE_URL.split("/")
+        if len(path_parts) > 3:
+            db_part = path_parts[3].split("?")[0]
+            if db_part:
+                db_name = db_part
+    except Exception as e:
+        logger.warning(f"Could not parse database name from URL, using default: {e}")
+        
+    db_connection.db = db_connection.client[db_name]
+    
+    # Create indexes asynchronously
+    try:
+        # Users indexes
+        await db_connection.db.users.create_index("email", unique=True)
+        await db_connection.db.users.create_index("google_id", unique=True, sparse=True)
+        
+        # Usage logs indexes
+        await db_connection.db.usage_logs.create_index([("fingerprint", 1), ("mode", 1)])
+        await db_connection.db.usage_logs.create_index("timestamp")
+        
+        # Prompt history indexes
+        await db_connection.db.prompt_histories.create_index("user_id")
+        await db_connection.db.prompt_histories.create_index("created_at")
+        
+        logger.info("MongoDB connection initialized and indexes verified/created successfully.")
+    except Exception as e:
+        logger.error(f"Error creating MongoDB indexes: {e}")
+        raise e
 
-    async with engine.begin() as conn:
-        # Create tables
-        await conn.run_sync(Base.metadata.create_all)
-        # Run migrations
-        await _run_migrations(conn)
-
-    logger.info("Database initialized")
+async def get_db():
+    """Dependency to retrieve MongoDB database instance."""
+    return db_connection.db

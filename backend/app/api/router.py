@@ -1,7 +1,8 @@
 import time
 from fastapi import APIRouter, Request, HTTPException, Depends
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timezone
+from bson import ObjectId
 from app.models.schemas import EnhanceRequest, EnhanceResponse, StatsResponse
 from app.services.sanitizer import sanitize
 from app.services.rate_limiter import check_rate_limit, record_usage, get_usage_stats
@@ -14,13 +15,10 @@ from app.core.security import decode_token
 from app.core.redis_client import redis_client
 from app.core.metrics import llm_calls_total, llm_latency, rate_limit_hits, active_users_gauge
 from app.models.user import User
-from app.models.usage import UsageLog
-from app.models.prompt_history import PromptHistory
-from sqlalchemy import select
 
 router = APIRouter(prefix="/api")
 
-async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)) -> Optional[User]:
+async def get_current_user(request: Request, db = Depends(get_db)) -> Optional[User]:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return None
@@ -39,14 +37,19 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
     if not user_id:
         return None
 
-    result = await db.execute(select(User).where(User.id == int(user_id)))
-    return result.scalar_one_or_none()
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        if user_doc:
+            return User(**user_doc)
+    except Exception:
+        pass
+    return None
 
 @router.post("/enhance", response_model=EnhanceResponse)
 async def enhance_prompt(
     body: EnhanceRequest,
     request: Request,
-    db: AsyncSession = Depends(get_db),
+    db = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user)
 ):
     user_id = current_user.id if current_user else None
@@ -131,24 +134,28 @@ async def enhance_prompt(
 
     usage = await get_usage_stats(fingerprint, body.mode)
 
-    # Log to main database (PostgreSQL/SQLite)
+    # Log to main database (MongoDB)
     if not is_byok:
-        db.add(UsageLog(
-            user_id=user_id,
-            fingerprint=fingerprint,
-            mode=body.mode,
-            provider_used=provider,
-            latency_ms=round(latency * 1000, 2),
-        ))
+        usage_log = {
+            "user_id": user_id,
+            "fingerprint": fingerprint,
+            "mode": body.mode,
+            "provider_used": provider,
+            "latency_ms": round(latency * 1000, 2),
+            "timestamp": datetime.now(timezone.utc)
+        }
+        await db.usage_logs.insert_one(usage_log)
+
         if current_user:
-            db.add(PromptHistory(
-                user_id=user_id,
-                original_prompt=body.prompt,
-                enhanced_prompt=result.get("enhanced_prompt"),
-                mode=body.mode,
-                provider_used=result.get("provider_used"),
-            ))
-        await db.commit()
+            prompt_history = {
+                "user_id": user_id,
+                "original_prompt": body.prompt,
+                "enhanced_prompt": result.get("enhanced_prompt"),
+                "mode": body.mode,
+                "provider_used": result.get("provider_used"),
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.prompt_histories.insert_one(prompt_history)
 
     return EnhanceResponse(
         enhanced_prompt=result["enhanced_prompt"],

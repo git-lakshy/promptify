@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
 
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./promptify.db"
+    DATABASE_URL: str = "mongodb://localhost:27017/promptify"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
