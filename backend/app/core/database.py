@@ -34,7 +34,18 @@ async def init_db():
     try:
         # Users indexes
         await db_connection.db.users.create_index("email", unique=True)
-        await db_connection.db.users.create_index("google_id", unique=True, sparse=True)
+        
+        # Safely drop the old index to recreate it with the correct partial filter expression
+        try:
+            await db_connection.db.users.drop_index("google_id_1")
+        except Exception:
+            pass
+            
+        await db_connection.db.users.create_index(
+            "google_id",
+            unique=True,
+            partialFilterExpression={"google_id": {"$type": "string"}}
+        )
         
         # Usage logs indexes
         await db_connection.db.usage_logs.create_index([("fingerprint", 1), ("mode", 1)])
