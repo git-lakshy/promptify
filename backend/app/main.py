@@ -79,9 +79,21 @@ async def metrics_endpoint():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation Error: {exc.errors()}")
+    
+    # Format list of validation errors into a single, user-friendly string
+    error_messages = []
+    for err in exc.errors():
+        loc_path = " -> ".join([str(x) for x in err.get("loc", []) if x != "body"])
+        msg = err.get("msg", "Invalid value")
+        if loc_path:
+            error_messages.append(f"{loc_path}: {msg}")
+        else:
+            error_messages.append(msg)
+            
+    readable_error = "; ".join(error_messages)
     return JSONResponse(
         status_code=422,
-        content={"detail": exc.errors()},
+        content={"detail": readable_error},
     )
 
 @app.exception_handler(Exception)

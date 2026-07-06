@@ -136,7 +136,12 @@ async def signup(body: SignupRequest, db = Depends(get_db)):
     # Check if user exists
     existing = await db.users.find_one({"email": body.email})
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        if existing.get("google_id") and not existing.get("password_hash"):
+            raise HTTPException(
+                status_code=400,
+                detail="This email is registered via Google Login. Please Sign In with Google."
+            )
+        raise HTTPException(status_code=400, detail="Email is already registered. Please Sign In.")
 
     # Create user with hashed password
     user = User(
@@ -168,7 +173,15 @@ async def signup(body: SignupRequest, db = Depends(get_db)):
 async def login(body: LoginRequest, db = Depends(get_db)):
     """Authenticate with email and password."""
     user_doc = await db.users.find_one({"email": body.email})
-    if not user_doc or not user_doc.get("password_hash"):
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    if not user_doc.get("password_hash"):
+        if user_doc.get("google_id"):
+            raise HTTPException(
+                status_code=400,
+                detail="This account is registered via Google Login. Please Sign In with Google."
+            )
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     user = User(**user_doc)
