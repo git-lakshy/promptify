@@ -21,7 +21,7 @@
 * **Asynchronous Prompt Refinement:** Uses dual-provider endpoints via **Groq** and **Google Gemini** to deliver low-latency optimized outputs.
 * **Hybrid User Authentication:** Custom email/password accounts with securely salted password hashing and Google OAuth 2.0.
 * **Intelligent Query Caching:** In-memory **Redis** caching to reduce redundant LLM calls and API overhead.
-* **Sliding-Window Rate Limiting:** Tier-based usage quotas (Free and Premium) enforced by local sliding-window SQLite storage with progressive cooldowns.
+* **Sliding-Window Rate Limiting:** Tier-based usage quotas (Free and Premium) enforced by local sliding-window storage with progressive cooldowns.
 * **Telemetry and Monitoring:** Integrated Prometheus metrics capturing latencies, session counts, and LLM call telemetry, with Grafana dashboards.
 
 ---
