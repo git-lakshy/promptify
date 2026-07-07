@@ -1,7 +1,6 @@
-# 🚀 Promptify
+#  Promptify
 
-> A high-performance, professional AI Prompt Refinement Engine that refines rough, raw prompts into structured, expert-level instructions.
-
+> A Glorified AI Prompt Refinement Engine 
 <img width="1920" height="1080" alt="Promptify Dashboard" src="https://github.com/user-attachments/assets/0366eb1e-f459-4a6f-bcaf-d791f2515748" />
 
 ---
@@ -17,7 +16,7 @@
 
 ---
 
-### ✨ Core Features
+### Core Features
 
 * **Asynchronous Prompt Refinement:** Uses dual-provider endpoints via **Groq** and **Google Gemini** to deliver low-latency optimized outputs.
 * **Hybrid User Authentication:** Custom email/password accounts with securely salted password hashing and Google OAuth 2.0.
@@ -27,7 +26,7 @@
 
 ---
 
-### 📂 Directory Structure
+###  Directory Structure
 
 ```
 ├── backend/            # FastAPI backend server
@@ -50,7 +49,7 @@
 
 ---
 
-### 💻 Getting Started
+###  Getting Started
 
 #### Prerequisites
 * Node.js (v18+)
@@ -89,17 +88,3 @@ The client dashboard will open on `http://localhost:5173`.
 
 ---
 
-### ☁️ Production Deployment
-
-#### Frontend (Vercel)
-The React client is hosted on Vercel. Set the following environment variable in your Vercel project:
-* `VITE_API_URL`: `https://your-backend-url.onrender.com/api`
-
-#### Backend (Render)
-The FastAPI server is deployed to Render. Provide the environment variables defined in [render.env](file:///c:/Users/laksh/Desktop/int%20projs%20/p1/promptify/render.env) inside your Render dashboard:
-* `DATABASE_URL`: Your MongoDB Atlas URI.
-* `REDIS_URL`: Your Redis connection URL.
-* `FRONTEND_URL`: `https://promptify.lakshyeah.in`
-* `BACKEND_URL`: `https://your-backend-url.onrender.com`
-* `ALLOWED_ORIGINS`: `https://promptify.lakshyeah.in`
-* `SECRET_KEY`: A secure 256-bit signing key.
